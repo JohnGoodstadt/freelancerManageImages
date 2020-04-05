@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/optimumanddev2/Documents/kotlinpro/freeimg/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-port/values-port.xml",
+            "map": [
+                {
+                    "source": "/home/optimumanddev2/.gradle/caches/transforms-2/files-2.1/ad8c60b841c82c0a1e1ba289ab2b3946/appcompat-1.1.0/res/values-port/values-port.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "55",
+                        "endOffsets": "106"
+                    }
+                }
+            ]
+        }
+    ]
+}

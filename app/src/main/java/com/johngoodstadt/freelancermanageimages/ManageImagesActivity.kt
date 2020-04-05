@@ -24,21 +24,21 @@ class ManageImagesActivity : AppCompatActivity() {
 
 
         UID = intent.getStringExtra("UID")
-        println(UID)
+        println("optiid"+UID)
 
-        button2.setOnClickListener {
+        done.setOnClickListener {
 
-            setResult(Activity.RESULT_OK) //signal something changed
-            finish()
+            //            setResult(Activity.RESULT_OK) //signal something changed
+//            finish()
 
         }
 
-        button3.setOnClickListener {
+        cancel.setOnClickListener {
             setResult(Activity.RESULT_CANCELED) //nothing changed
             finish()
         }
         //add file at end
-        button4.setOnClickListener {
+        addfilatend.setOnClickListener {
             //add file at end
             val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
             val filenumber = number + 1
@@ -54,7 +54,7 @@ class ManageImagesActivity : AppCompatActivity() {
 
 
         //add file at 2
-        button5.setOnClickListener {
+        addfileat2.setOnClickListener {
 
             val filenumber = 2
             val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
@@ -76,7 +76,7 @@ class ManageImagesActivity : AppCompatActivity() {
         }
 
         //remove at 1
-        button6.setOnClickListener {
+        removefileat1.setOnClickListener {
             val filenumber = 1
             val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 
@@ -89,7 +89,7 @@ class ManageImagesActivity : AppCompatActivity() {
             writeDebug()
         }
         //remove file from end
-        button7.setOnClickListener {
+        removefileatend.setOnClickListener {
 
             val filenumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
             if(filenumber == 0){
@@ -103,7 +103,7 @@ class ManageImagesActivity : AppCompatActivity() {
         }
 
         //crop image 2
-        button8.setOnClickListener {
+        cropimg2.setOnClickListener {
 
             if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
                 return@setOnClickListener
@@ -117,7 +117,7 @@ class ManageImagesActivity : AppCompatActivity() {
             writeDebug()
         }
 
-        button9.setOnClickListener {
+        imginsertat2.setOnClickListener {
 
             if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
                 return@setOnClickListener
@@ -156,7 +156,7 @@ class ManageImagesActivity : AppCompatActivity() {
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             if (resultCode == Activity.RESULT_OK) {
-                println("Something changed")
+                println("Something changedmanage")
                 data?.let {
                     val result = CropImage.getActivityResult(it)
                     val bitmap = MediaStore.Images.Media.getBitmap(MyApplication.getAppContext().getContentResolver(), result.uri)
