@@ -34,15 +34,13 @@ import kotlinx.android.synthetic.main.activity_main.*
  * represents pages as [View]s.
  */
 class MutableCollectionViewActivity : MutableCollectionBaseActivity() {
-    object RequestCodes {
-        const val REQUEST_MANAGE_IMAGES = 1000
-    }
+
 
 
 
     override fun createViewPagerAdapter(): RecyclerView.Adapter<*> {
 //        var list: List<String> = listOf()
-        val UID = "BACH"
+        val UID = UID
         val items = items // avoids resolving the ViewModel multiple times
         val clickRegistry: ClickRegistry by viewModels()
         return object : RecyclerView.Adapter<PageViewHolder>() {
@@ -59,6 +57,10 @@ class MutableCollectionViewActivity : MutableCollectionBaseActivity() {
             override fun getItemId(position: Int): Long = items.itemId(position)
         }.apply { setHasStableIds(true) }
     }
+    /*fun setItem(UID: String) {
+        this.UID = UID
+
+    }*/
 }
 
 class PageViewHolder(parent: ViewGroup) :
@@ -89,7 +91,10 @@ class PageViewHolder(parent: ViewGroup) :
             updateClickText()
         }
     }
+
+
 }
+
 
 /**
  * Stores click counts for items. Items are identified by an id.

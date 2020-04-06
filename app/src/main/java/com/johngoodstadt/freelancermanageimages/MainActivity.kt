@@ -14,6 +14,7 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_MANAGE_IMAGES = 1000
     }
 
+
     val UID = "BACH"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,17 +23,14 @@ class MainActivity : AppCompatActivity() {
 
         textview1.setOnClickListener {
                         val intent = Intent(this@MainActivity, MutableCollectionViewActivity::class.java)
-                        startActivity(intent)
+            intent.putExtra("UID", UID)
+            startActivityForResult(intent, RequestCodes.REQUEST_MANAGE_IMAGES)
+
         }
 
         button1.setOnClickListener {
-           println("")
+            val intent = Intent(this@MainActivity, MutableCollectionViewActivity::class.java)
 //            val intent = Intent(this@MainActivity, ManageImagesActivity::class.java)
-//            intent.putExtra("UID", UID)
-//            startActivityForResult(intent, RequestCodes.REQUEST_MANAGE_IMAGES)
-
-//            val intent = Intent(this@MainActivity, MutableCollectionViewActivity::class.java)
-            val intent = Intent(this@MainActivity, ManageImagesActivity::class.java)
             intent.putExtra("UID", UID)
             startActivityForResult(intent, RequestCodes.REQUEST_MANAGE_IMAGES)
 

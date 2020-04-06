@@ -23,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -38,6 +39,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_manage_images.*
+import android.R.id.edit
+import android.content.SharedPreferences.Editor
+import android.content.SharedPreferences
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 /**
  * Shows how to use notifyDataSetChanged with [ViewPager2]
@@ -47,10 +56,16 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
     private lateinit var buttonAddBefore: Button
     private lateinit var buttonGoTo: Button
     private lateinit var buttonRemove: Button
+    private lateinit var buttonCrop: Button
     private lateinit var itemSpinner: Spinner
     private lateinit var checkboxDiffUtil: CheckBox
     private lateinit var viewPager: ViewPager2
-    val UID = "BACH"
+    var onactiposi: Int = 1
+    var howmanypage: Int = 1
+    companion object {
+        public var UID = "BACH"
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,22 +74,29 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
         buttonAddAfter = findViewById(R.id.buttonAddAfter)
         buttonAddBefore = findViewById(R.id.buttonAddBefore)
         buttonGoTo = findViewById(R.id.buttonGoTo)
+        buttonCrop = findViewById(R.id.buttonCrop)
         buttonRemove = findViewById(R.id.buttonRemove)
         itemSpinner = findViewById(R.id.itemSpinner)
         checkboxDiffUtil = findViewById(R.id.useDiffUtil)
         viewPager = findViewById(R.id.viewPager)
 //////////////////from manger
 
-//        val intent = intent
-//
-//
-//        UID = intent.getStringExtra("UID")
-        println("optiid"+UID)
+        try {
+            val intent = intent
+            UID = intent.getStringExtra("UID")
+            println("optiid"+UID)
+           MutableCollectionBaseActivity.UID = UID
+        }catch (e : Exception){e.printStackTrace()}
 
-        done.setOnClickListener {
+/////////////////////for intial imag for viewpager
+        howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+        Log.e("sonamany",howmanypage.toString()+"onc")
+        if(howmanypage == 0){
+            items.addNewAt(viewPager.currentItem)
 
-//            setResult(Activity.RESULT_OK) //signal something changed
-//            finish()
+            addanother(1)
+        }else{
+            howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 
         }
 
@@ -82,56 +104,24 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             setResult(Activity.RESULT_CANCELED) //nothing changed
             finish()
         }
-        //add file at end
-        addfilatend.setOnClickListener {
-            //add file at end
-            val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-            val filenumber = number + 1
-            val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
 
-            val myDrawable = resources.getDrawable(R.drawable.green_circle)
-            val anImage = (myDrawable as BitmapDrawable).bitmap
-
-            LibraryFilesystem.writeImageFileToFileSystemFiles(anImage, filename)
-
-            writeDebug()
-        }
-
-
-        //add file at 2
-        addfileat2.setOnClickListener {
-
-            val filenumber = 2
-            val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-
-            if(count == 0){
-                return@setOnClickListener
-            }
-
-            renameFilesUp(UID,filenumber, count)
-
-            val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
-
-            val myDrawable = resources.getDrawable(R.drawable.green_circle)
-            val anImage = (myDrawable as BitmapDrawable).bitmap
-
-            LibraryFilesystem.writeImageFileToFileSystemFiles(anImage, filename)
-
-            writeDebug()
-        }
 
         //remove at 1
-        removefileat1.setOnClickListener {
-            val filenumber = 1
+        fun removefileat1(posi: Int) {
+            val filenumber = posi
             val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 
             if(count == 0){
-                return@setOnClickListener
+//                return@setOnClickListener
             }
 
             removeFileAndRenameDown(UID, filenumber, count)
 
             writeDebug()
+            val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
+            startActivity(intent)
+//            recreate()
+            finish()
         }
         //remove file from end
         removefileatend.setOnClickListener {
@@ -148,27 +138,59 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
         }
 
         //crop image 2
-        cropimg2.setOnClickListener {
+        fun cropimg2(posi: Int) {
 
-            if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+            /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
                 return@setOnClickListener
-            }
+            }*/
 
-            val filenumber = 2
+            val filenumber = posi
+//            val filenumber = 2
+            onactiposi = posi
+
             val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
             val uri = LibraryFilesystem.getUriFromFilename( filename)
             CropImage.activity(uri).start(this);
 
             writeDebug()
+//            val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+//            removeFileAndRenameDown(UID, filenumber, posi)
+
+
+          /*  writeDebug()
+//            val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
+//            startActivity(intent)
+            recreate()
+//            finish()
+*/
+
         }
 
-        imginsertat2.setOnClickListener {
+        fun imginsertatend(posi: Int) {
+            val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+            Log.e("sonainsrt", number.toString()+" "+posi);
 
-            if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+            /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
                 return@setOnClickListener
-            }
+            }*/
 
+            val filenumber = number + 1
+//            val filenumber = posi + 1
 
+            onactiposi = filenumber
+            CropImage.activity().start(this);
+
+            writeDebug()
+        }
+        fun imginsertat2(posi: Int) {
+            val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+            Log.e("sonainsrt", number.toString()+" "+posi);
+
+            /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+                return@setOnClickListener
+            }*/
+
+            onactiposi = posi
             CropImage.activity().start(this);
 
             writeDebug()
@@ -205,13 +227,16 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                     text = getItem(position)
                 }
 
+
             override fun getItem(position: Int): String = items.getItemById(getItemId(position))
             override fun getItemId(position: Int): Long = items.itemId(position)
             override fun getCount(): Int = items.size
         }
 
         buttonGoTo.setOnClickListener {
-            viewPager.setCurrentItem(itemSpinner.selectedItemPosition, true)
+            setResult(Activity.RESULT_OK) //signal something changed
+            finish()
+
         }
 
         fun changeDataSet(performChanges: () -> Unit) {
@@ -262,17 +287,57 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
         }
 
         buttonRemove.setOnClickListener {
-            changeDataSet { items.removeAt(itemSpinner.selectedItemPosition) }
+            Log.e("sonacurre", viewPager.currentItem.toString());
+            changeDataSet { items.removeAt(viewPager.currentItem+1) }
+//            changeDataSet { items.removeAt(itemSpinner.selectedItemPosition) }
+            removefileat1(viewPager.currentItem+1)
+        }
+
+        buttonCrop.setOnClickListener {
+            Log.e("sonacurre", viewPager.currentItem.toString());
+//            changeDataSet { items.addNewAt(viewPager.currentItem) }
+            cropimg2(viewPager.currentItem+1)
+//            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition) }
+
         }
 
         buttonAddBefore.setOnClickListener {
-            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition) }
+            Log.e("sonacurre", viewPager.currentItem.toString());
+            changeDataSet { items.addNewAt(viewPager.currentItem) }
+            imginsertat2(viewPager.currentItem)
+//            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition) }
         }
 
         buttonAddAfter.setOnClickListener {
-            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition + 1) }
+            Log.e("sonacurre", viewPager.currentItem.toString());
+            changeDataSet { items.addNewAt(viewPager.currentItem+1) }
+//            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition + 1) }
+
+            imginsertatend(viewPager.currentItem)
         }
+
+
+
     }
+
+    fun addanother(filecnt : Int) {
+        val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+//        Log.e("sonainsrt", number.toString()+" "+posi);
+
+        /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+            return@setOnClickListener
+        }*/
+
+        val filenumber = number + 1
+//            val filenumber = posi + 1
+
+        onactiposi = filenumber
+        CropImage.activity().start(this);
+
+        writeDebug()
+
+    }
+
 
     abstract fun createViewPagerAdapter(): RecyclerView.Adapter<*>
 
@@ -308,8 +373,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                     val result = CropImage.getActivityResult(it)
                     val bitmap = MediaStore.Images.Media.getBitmap(MyApplication.getAppContext().getContentResolver(), result.uri)
 
-
-                    val startnumber = 2
+                    val startnumber = onactiposi
                     val lastNumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 
                     renameFilesUp(UID,startnumber, lastNumber)
@@ -318,6 +382,10 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
                     LibraryFilesystem.writeImageFileToFileSystemFiles(bitmap, filename)
 
+                    val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
+                    startActivity(intent)
+                    finish()
+//                recreate()
 
 
                 }
@@ -333,14 +401,12 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 /** A very simple collection of items. Optimized for simplicity (i.e. not performance). */
 class ItemsViewModel : ViewModel() {
     private var nextValue = 1L
-   /* val categories = listOf(
-        Category(1, "Your Recording"),
-        Category(2, "Film"),
-        Category(3, "Series"),
-        Category(4, "Kids"),
-        Category(5, "Sport")
-    )
-   */ private val items = (1..9).map { longToItem(nextValue++) }.toMutableList()
+
+    public val UID = MutableCollectionBaseActivity.UID
+    public var howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+    private val items = (1..howmanypage).map { longToItem(nextValue++) }.toMutableList()
+//   private val items = (1..2).map { longToItem(nextValue++) }.toMutableList()
+//   */ private val items = (1..9).map { longToItem(nextValue++) }.toMutableList()
 
     fun getItemById(id: Long): String = items.first { itemToLong(it) == id }
     fun itemId(position: Int): Long = itemToLong(items[position])
