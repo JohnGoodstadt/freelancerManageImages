@@ -111,10 +111,10 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             val filenumber = posi
             val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 
-            if(count == 0){
+            /*if(count == 0){
 //                return@setOnClickListener
             }
-
+*/
             removeFileAndRenameDown(UID, filenumber, count)
 
             writeDebug()
@@ -288,9 +288,25 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
         buttonRemove.setOnClickListener {
             Log.e("sonacurre", viewPager.currentItem.toString());
+            try {
+
             changeDataSet { items.removeAt(viewPager.currentItem+1) }
 //            changeDataSet { items.removeAt(itemSpinner.selectedItemPosition) }
             removefileat1(viewPager.currentItem+1)
+            }catch (e: Exception){e.printStackTrace()
+                changeDataSet { items.removeAt(viewPager.currentItem)
+                    val filenumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                    if(filenumber == 0){
+//                        return@setOnClickListener
+                    }
+
+                    val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
+                    LibraryFilesystem.removeFile(filename)
+
+                    writeDebug()
+                }
+            }
+
         }
 
         buttonCrop.setOnClickListener {
