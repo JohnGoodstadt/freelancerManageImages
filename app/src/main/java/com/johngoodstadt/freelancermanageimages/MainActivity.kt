@@ -15,7 +15,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    val UID = "BACH"
+    val UID = "HANDLE"
+//    val UID = "BACH"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

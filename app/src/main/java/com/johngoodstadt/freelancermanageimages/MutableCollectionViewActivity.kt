@@ -40,6 +40,7 @@ class MutableCollectionViewActivity : MutableCollectionBaseActivity() {
 
     override fun createViewPagerAdapter(): RecyclerView.Adapter<*> {
 //        var list: List<String> = listOf()
+        println("optiidviewmodel"+UID)
         val UID = UID
         val items = items // avoids resolving the ViewModel multiple times
         val clickRegistry: ClickRegistry by viewModels()
@@ -100,6 +101,7 @@ class PageViewHolder(parent: ViewGroup) :
  * Stores click counts for items. Items are identified by an id.
  */
 class ClickRegistry : ViewModel() {
+
     private val clickCount = mutableMapOf<Long, Int>()
     fun getClickCount(itemId: Long): Int = clickCount[itemId] ?: 0
     fun registerClick(itemId: Long) = clickCount.set(itemId, 1 + getClickCount(itemId))
