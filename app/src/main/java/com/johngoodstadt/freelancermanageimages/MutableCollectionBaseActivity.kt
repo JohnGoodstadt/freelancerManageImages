@@ -60,6 +60,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
     private lateinit var itemSpinner: Spinner
     private lateinit var checkboxDiffUtil: CheckBox
     private lateinit var viewPager: ViewPager2
+    var from: String = "click"
     var onactiposi: Int = 1
     var howmanypage: Int = 1
     companion object {
@@ -119,7 +120,9 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
             writeDebug()
             val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
+            intent.putExtra("UID", UID)
             startActivity(intent)
+
 //            recreate()
             finish()
         }
@@ -147,6 +150,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             val filenumber = posi
 //            val filenumber = 2
             onactiposi = posi
+            from = "cropimg"
 
             val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
             val uri = LibraryFilesystem.getUriFromFilename( filename)
@@ -251,6 +255,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             setResult(Activity.RESULT_OK) //signal something changed
             finish()
 
+
         }
 
         fun changeDataSet(performChanges: () -> Unit) {
@@ -333,7 +338,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
         buttonAddnext.setOnClickListener {
 //                                viewPager.setCurrentItem(4, false)
-
+            from = "click"
             Log.e("sonacurrenext", viewPager.currentItem.toString()+" ");
             changeDataSet { items.addNewAt(viewPager.currentItem+1) }
             imginsertatNext(viewPager.currentItem+2)
@@ -406,23 +411,31 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                 println("Something changedmanage")
                 data?.let {
                     val result = CropImage.getActivityResult(it)
-                    val bitmap = MediaStore.Images.Media.getBitmap(MyApplication.getAppContext().getContentResolver(), result.uri)
+                    val bitmap = MediaStore.Images.Media.getBitmap(
+                        MyApplication.getAppContext().getContentResolver(),
+                        result.uri
+                    )
 
                     val startnumber = onactiposi
                     val lastNumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 
-                    renameFilesUp(UID,startnumber, lastNumber)
+                    renameFilesUp(UID, startnumber, lastNumber)
 
-                    val filename = LibraryFilesystem.getFileNameByUID(UID,startnumber.toString())
+                    val filename = LibraryFilesystem.getFileNameByUID(UID, startnumber.toString())
 
                     LibraryFilesystem.writeImageFileToFileSystemFiles(bitmap, filename)
+                    if (from.equals("cropimg")){
                     val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
                     try {
-                        removeFileAndRenameDown(UID, onactiposi+1, count)
+                        removeFileAndRenameDown(UID, onactiposi + 1, count)
 
-                    }catch (e: Exception){e.printStackTrace()}
-
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    }
                     val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
+                    intent.putExtra("UID", UID)
+//                    setResult(MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES,intent);
                     startActivity(intent)
                     finish()
 //                recreate()

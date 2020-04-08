@@ -79,6 +79,9 @@ class MainActivity : AppCompatActivity() {
                 refreshImages()
             }else{
                 println("Nothing done")
+                refreshImages()
+                onRestart()
+
             }
 
         }
