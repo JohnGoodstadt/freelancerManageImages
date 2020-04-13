@@ -77,10 +77,11 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK){
                 println("Something changed")
                 refreshImages()
+                recreate()
             }else{
                 println("Nothing done")
                 refreshImages()
-                onRestart()
+                recreate()
 
             }
 

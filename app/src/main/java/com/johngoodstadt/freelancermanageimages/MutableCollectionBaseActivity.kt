@@ -45,7 +45,9 @@ import android.content.SharedPreferences
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
+import kotlinx.android.synthetic.main.activity_manage_images.cancel
+import kotlinx.android.synthetic.main.activity_manage_images.removefileatend
+import kotlinx.android.synthetic.main.noimg.*
 
 
 /**
@@ -61,6 +63,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
     private lateinit var checkboxDiffUtil: CheckBox
     private lateinit var viewPager: ViewPager2
     var from: String = "click"
+    var firsttime: String = "no"
     var onactiposi: Int = 1
     var howmanypage: Int = 1
     companion object {
@@ -70,206 +73,244 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_manage_images)
+//        setContentView(R.layout.activity_manage_images)
 
-        buttonAddAfter = findViewById(R.id.buttonAddAfter)
-        buttonAddnext = findViewById(R.id.buttonAddnext)
-        buttonGoTo = findViewById(R.id.buttonGoTo)
-        buttonCrop = findViewById(R.id.buttonCrop)
-        buttonRemove = findViewById(R.id.buttonRemove)
-        itemSpinner = findViewById(R.id.itemSpinner)
-        checkboxDiffUtil = findViewById(R.id.useDiffUtil)
-        viewPager = findViewById(R.id.viewPager)
-//////////////////from manger
+//
+//        buttonAddAfter = findViewById(R.id.buttonAddAfter)
+//        buttonAddnext = findViewById(R.id.buttonAddnext)
+//        buttonGoTo = findViewById(R.id.buttonGoTo)
+//        buttonCrop = findViewById(R.id.buttonCrop)
+//        buttonRemove = findViewById(R.id.buttonRemove)
+//        itemSpinner = findViewById(R.id.itemSpinner)
+//        checkboxDiffUtil = findViewById(R.id.useDiffUtil)
+//        viewPager = findViewById(R.id.viewPager)
+////////////////////from manger
 
         try {
             val intent = intent
             UID = intent.getStringExtra("UID")
-            println("optiid"+UID)
-           MutableCollectionBaseActivity.UID = UID
-        }catch (e : Exception){e.printStackTrace()}
+            firsttime = intent.getStringExtra("firsttime")
+            MutableCollectionBaseActivity.UID = UID
+            println("optiid" + UID+" "+firsttime)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
 /////////////////////for intial imag for viewpager
         howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-        Log.e("sonamany",howmanypage.toString()+"onc")
-        if(howmanypage == 0){
-            items.addNewAt(viewPager.currentItem)
+        Log.e("sonamany", howmanypage.toString() + "onc")
+        if (howmanypage == 0 && firsttime.equals("no")) {
+            setContentView(R.layout.noimg);
+            gotomanager.setOnClickListener {
+                val intent = Intent(
+                    this@MutableCollectionBaseActivity,
+                    MutableCollectionViewActivity::class.java
+                )
+                intent.putExtra("UID", UID)
+                intent.putExtra("firsttime", "yes")
+                startActivity(intent)
+                finish()
 
-            addanother(1)
-        }else{
-            howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-
-        }
-
-        cancel.setOnClickListener {
-            setResult(Activity.RESULT_CANCELED) //nothing changed
-            finish()
-        }
-
-
-        //remove at 1
-        fun removefileat1(posi: Int) {
-            val filenumber = posi
-            val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-
-            /*if(count == 0){
-//                return@setOnClickListener
             }
-*/
-            removeFileAndRenameDown(UID, filenumber, count)
 
-            writeDebug()
-            val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
-            intent.putExtra("UID", UID)
-            startActivity(intent)
+//            items.addNewAt(viewPager.currentItem)
+
+//            addanother(1)
+        } else {
+            howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+            setContentView(R.layout.activity_manage_images)
+
+            buttonAddAfter = findViewById(R.id.buttonAddAfter)
+            buttonAddnext = findViewById(R.id.buttonAddnext)
+            buttonGoTo = findViewById(R.id.buttonGoTo)
+            buttonCrop = findViewById(R.id.buttonCrop)
+            buttonRemove = findViewById(R.id.buttonRemove)
+            itemSpinner = findViewById(R.id.itemSpinner)
+            checkboxDiffUtil = findViewById(R.id.useDiffUtil)
+            viewPager = findViewById(R.id.viewPager)
+//        }
+
+            if(firsttime.equals("yes")){
+
+                items.addNewAt(viewPager.currentItem)
+
+                addanother(1)
+
+            }
+
+
+            cancel.setOnClickListener {
+                setResult(Activity.RESULT_CANCELED) //nothing changed
+                finish()
+            }
+
+
+            //remove at 1
+            fun removefileat1(posi: Int) {
+                val filenumber = posi
+                val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+
+                /*if(count == 0){
+    //                return@setOnClickListener
+                }
+    */
+                removeFileAndRenameDown(UID, filenumber, count)
+
+                writeDebug()
+                val intent = Intent(
+                    this@MutableCollectionBaseActivity,
+                    MutableCollectionViewActivity::class.java
+                )
+                intent.putExtra("UID", UID)
+                startActivity(intent)
 
 //            recreate()
-            finish()
-        }
-        //remove file from end
-        removefileatend.setOnClickListener {
+                finish()
+            }
+            //remove file from end
+            removefileatend.setOnClickListener {
 
-            val filenumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-            if(filenumber == 0){
-                return@setOnClickListener
+                val filenumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                if (filenumber == 0) {
+                    return@setOnClickListener
+                }
+
+                val filename = LibraryFilesystem.getFileNameByUID(UID, filenumber.toString())
+                LibraryFilesystem.removeFile(filename)
+
+                writeDebug()
             }
 
-            val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
-            LibraryFilesystem.removeFile(filename)
+            //crop image 2
+            fun cropimg2(posi: Int) {
 
-            writeDebug()
-        }
+                /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+                    return@setOnClickListener
+                }*/
 
-        //crop image 2
-        fun cropimg2(posi: Int) {
-
-            /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
-                return@setOnClickListener
-            }*/
-
-            val filenumber = posi
+                val filenumber = posi
 //            val filenumber = 2
-            onactiposi = posi
-            from = "cropimg"
+                onactiposi = posi
+                from = "cropimg"
 
-            val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
-            val uri = LibraryFilesystem.getUriFromFilename( filename)
-            CropImage.activity(uri).start(this);
+                val filename = LibraryFilesystem.getFileNameByUID(UID, filenumber.toString())
+                val uri = LibraryFilesystem.getUriFromFilename(filename)
+                CropImage.activity(uri).start(this);
 
-            writeDebug()
+                writeDebug()
 //            val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 //            removeFileAndRenameDown(UID, filenumber, posi)
 
 
-          /*  writeDebug()
-//            val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
-//            startActivity(intent)
-            recreate()
-//            finish()
-*/
+                /*  writeDebug()
+    //            val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
+    //            startActivity(intent)
+                recreate()
+    //            finish()
+    */
 
-        }
+            }
 
-        fun imginsertatend(posi: Int) {
-            val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-            Log.e("sonainsrt", number.toString()+" "+posi);
+            fun imginsertatend(posi: Int) {
+                val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                Log.e("sonainsrt", number.toString() + " " + posi);
 
-            /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
-                return@setOnClickListener
-            }*/
+                /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+                    return@setOnClickListener
+                }*/
 
-            val filenumber = number + 1
+                val filenumber = number + 1
 //            val filenumber = posi + 1
 
-            onactiposi = filenumber
-            CropImage.activity().start(this);
+                onactiposi = filenumber
+                CropImage.activity().start(this);
 
+                writeDebug()
+            }
+
+            fun imginsertat2(posi: Int) {
+                val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                Log.e("sonainsrt", number.toString() + " " + posi);
+
+                /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+                    return@setOnClickListener
+                }*/
+
+                onactiposi = posi
+                CropImage.activity().start(this);
+
+                writeDebug()
+            }
+
+            fun imginsertatNext(posi: Int) {
+                val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                Log.e("sonainsrt", number.toString() + " " + posi);
+
+                /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
+                    return@setOnClickListener
+                }*/
+
+                onactiposi = posi
+                CropImage.activity().start(this);
+
+                writeDebug()
+            }
             writeDebug()
-        }
-        fun imginsertat2(posi: Int) {
-            val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-            Log.e("sonainsrt", number.toString()+" "+posi);
-
-            /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
-                return@setOnClickListener
-            }*/
-
-            onactiposi = posi
-            CropImage.activity().start(this);
-
-            writeDebug()
-        }
-
-        fun imginsertatNext(posi: Int) {
-            val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-            Log.e("sonainsrt", number.toString()+" "+posi);
-
-            /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
-                return@setOnClickListener
-            }*/
-
-            onactiposi = posi
-            CropImage.activity().start(this);
-
-            writeDebug()
-        }
-        writeDebug()
 
 ///////////////////////////end manager
 
-        //create a folder for this app com.johngoodstadt.freelancermanageimages/files/test_image.png
-        val mBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-        val filename = "test_image"
-        LibraryFilesystem.writeImageFileToFileSystemFiles(mBitmap, filename)
+            //create a folder for this app com.johngoodstadt.freelancermanageimages/files/test_image.png
+            val mBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+            val filename = "test_image"
+            LibraryFilesystem.writeImageFileToFileSystemFiles(mBitmap, filename)
 
 
-        //examines files present
-        val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-        println("count of files:${count}")
+            //examines files present
+            val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+            println("count of files:${count}")
 
-        for (x in 1 .. count){
-            println("file:${x} ${LibraryFilesystem.getFileNameByUID(UID,x.toString())}")
-        }
+            for (x in 1..count) {
+                println("file:${x} ${LibraryFilesystem.getFileNameByUID(UID, x.toString())}")
+            }
 
-        val file1 = LibraryFilesystem.getFileNameByUID(UID,"1")
+            val file1 = LibraryFilesystem.getFileNameByUID(UID, "1")
 
 
-        viewPager.adapter = createViewPagerAdapter()
+            viewPager.adapter = createViewPagerAdapter()
 
-        itemSpinner.adapter = object : BaseAdapter() {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
-                ((convertView as TextView?) ?: TextView(parent.context)).apply {
-                    if (Build.VERSION.SDK_INT >= 17) {
-                        textDirection = View.TEXT_DIRECTION_LOCALE
+            itemSpinner.adapter = object : BaseAdapter() {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
+                    ((convertView as TextView?) ?: TextView(parent.context)).apply {
+                        if (Build.VERSION.SDK_INT >= 17) {
+                            textDirection = View.TEXT_DIRECTION_LOCALE
+                        }
+                        text = getItem(position)
                     }
-                    text = getItem(position)
-                }
 
 
-            override fun getItem(position: Int): String = items.getItemById(getItemId(position))
-            override fun getItemId(position: Int): Long = items.itemId(position)
-            override fun getCount(): Int = items.size
-        }
+                override fun getItem(position: Int): String = items.getItemById(getItemId(position))
+                override fun getItemId(position: Int): Long = items.itemId(position)
+                override fun getCount(): Int = items.size
+            }
 
-        buttonGoTo.setOnClickListener {
-            setResult(Activity.RESULT_OK) //signal something changed
-            finish()
+            buttonGoTo.setOnClickListener {
+                setResult(Activity.RESULT_OK) //signal something changed
+                finish()
 
 
-        }
+            }
 
-        fun changeDataSet(performChanges: () -> Unit) {
+            fun changeDataSet(performChanges: () -> Unit) {
 
-            /** without [DiffUtil] */
-            val oldPosition = viewPager.currentItem
-            val currentItemId = items.itemId(oldPosition)
-            performChanges()
-            viewPager.adapter!!.notifyDataSetChanged()
-            if (items.contains(currentItemId)) {
-                val newPosition =
-                    (0 until items.size).indexOfFirst { items.itemId(it) == currentItemId }
+                /** without [DiffUtil] */
+                val oldPosition = viewPager.currentItem
+                val currentItemId = items.itemId(oldPosition)
+                performChanges()
+                viewPager.adapter!!.notifyDataSetChanged()
+                if (items.contains(currentItemId)) {
+                    val newPosition =
+                        (0 until items.size).indexOfFirst { items.itemId(it) == currentItemId }
 //                viewPager.setCurrentItem(newPosition, false)
-
 
 
 //            if (checkboxDiffUtil.isChecked) {
@@ -299,70 +340,72 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 //                    viewPager.setCurrentItem(newPosition, false)
 //                }
 
-            }
-
-            // item spinner update
-            (itemSpinner.adapter as BaseAdapter).notifyDataSetChanged()
-        }
-
-        buttonRemove.setOnClickListener {
-            Log.e("sonacurre", viewPager.currentItem.toString());
-            try {
-
-            changeDataSet { items.removeAt(viewPager.currentItem+1) }
-//            changeDataSet { items.removeAt(itemSpinner.selectedItemPosition) }
-            removefileat1(viewPager.currentItem+1)
-            }catch (e: Exception){e.printStackTrace()
-                changeDataSet { items.removeAt(viewPager.currentItem)
-                    val filenumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-                    if(filenumber == 0){
-//                        return@setOnClickListener
-                    }
-
-                    val filename = LibraryFilesystem.getFileNameByUID(UID,filenumber.toString())
-                    LibraryFilesystem.removeFile(filename)
-
-                    writeDebug()
                 }
+
+                // item spinner update
+                (itemSpinner.adapter as BaseAdapter).notifyDataSetChanged()
             }
 
-        }
+            buttonRemove.setOnClickListener {
+                Log.e("sonacurre", viewPager.currentItem.toString());
+                try {
 
-        buttonCrop.setOnClickListener {
-            Log.e("sonacurre", viewPager.currentItem.toString());
+                    changeDataSet { items.removeAt(viewPager.currentItem + 1) }
+//            changeDataSet { items.removeAt(itemSpinner.selectedItemPosition) }
+                    removefileat1(viewPager.currentItem + 1)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    changeDataSet {
+                        items.removeAt(viewPager.currentItem)
+                        val filenumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                        if (filenumber == 0) {
+//                        return@setOnClickListener
+                        }
+
+                        val filename = LibraryFilesystem.getFileNameByUID(UID, filenumber.toString())
+                        LibraryFilesystem.removeFile(filename)
+
+                        writeDebug()
+                    }
+                }
+
+            }
+
+            buttonCrop.setOnClickListener {
+                Log.e("sonacurre", viewPager.currentItem.toString());
 //            changeDataSet { items.addNewAt(viewPager.currentItem) }
-            cropimg2(viewPager.currentItem+1)
+                cropimg2(viewPager.currentItem + 1)
 //            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition) }
 
-        }
+            }
 
-        buttonAddnext.setOnClickListener {
-//                                viewPager.setCurrentItem(4, false)
-            from = "click"
-            Log.e("sonacurrenext", viewPager.currentItem.toString()+" ");
-            changeDataSet { items.addNewAt(viewPager.currentItem+1) }
-            imginsertatNext(viewPager.currentItem+2)
+            buttonAddnext.setOnClickListener {
+                //                                viewPager.setCurrentItem(4, false)
+                from = "click"
+                Log.e("sonacurrenext", viewPager.currentItem.toString() + " ");
+                changeDataSet { items.addNewAt(viewPager.currentItem + 1) }
+                imginsertatNext(viewPager.currentItem + 2)
 //            imginsertatNext(itemSpinner.selectedItemPosition+1)
 //            imginsertatNext(6)
 //            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition+1) }
 //            changeDataSet { items.addNewAt(6) }
-        }
+            }
 
-        buttonAddAfter.setOnClickListener {
-            Log.e("sonacurre", viewPager.currentItem.toString());
-            changeDataSet { items.addNewAt(viewPager.currentItem+1) }
+            buttonAddAfter.setOnClickListener {
+                Log.e("sonacurre", viewPager.currentItem.toString());
+                changeDataSet { items.addNewAt(viewPager.currentItem + 1) }
 //            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition + 1) }
 
-            imginsertatend(viewPager.currentItem)
+                imginsertatend(viewPager.currentItem)
+            }
         }
-
 
 
     }
 
     fun addanother(filecnt : Int) {
         val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-//        Log.e("sonainsrt", number.toString()+" "+posi);
+        Log.e("sonafirst", number.toString()+" "+viewPager.currentItem);
 
         /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
             return@setOnClickListener
@@ -418,6 +461,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
                     val startnumber = onactiposi
                     val lastNumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                    Log.e("sonaActifr", startnumber.toString()+" "+lastNumber.toString());
 
                     renameFilesUp(UID, startnumber, lastNumber)
 
@@ -425,13 +469,13 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
                     LibraryFilesystem.writeImageFileToFileSystemFiles(bitmap, filename)
                     if (from.equals("cropimg")){
-                    val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-                    try {
-                        removeFileAndRenameDown(UID, onactiposi + 1, count)
+                        val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+                        try {
+                            removeFileAndRenameDown(UID, onactiposi + 1, count)
 
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                     val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
                     intent.putExtra("UID", UID)
@@ -442,6 +486,14 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
 
                 }
+            }else{
+                val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
+                intent.putExtra("UID", UID)
+//                    setResult(MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES,intent);
+                startActivity(intent)
+                finish()
+//                recreate()
+
             }
         }
 
@@ -457,6 +509,8 @@ class ItemsViewModel : ViewModel() {
 
     public val UID = MutableCollectionBaseActivity.UID
     public var howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
+
+    //    private val items = (0..0).map { longToItem(nextValue++) }.toMutableList()
     private val items = (1..howmanypage).map { longToItem(nextValue++) }.toMutableList()
 //   private val items = (1..2).map { longToItem(nextValue++) }.toMutableList()
 //    private val items = (1..9).map { longToItem(nextValue++) }.toMutableList()
