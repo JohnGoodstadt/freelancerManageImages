@@ -42,6 +42,7 @@ import kotlinx.android.synthetic.main.activity_manage_images.*
 import android.R.id.edit
 import android.content.SharedPreferences.Editor
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
@@ -63,6 +64,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
     private lateinit var checkboxDiffUtil: CheckBox
     private lateinit var viewPager: ViewPager2
     var from: String = "click"
+    var changed: String = "notOK"
     var firsttime: String = "no"
     var onactiposi: Int = 1
     var howmanypage: Int = 1
@@ -90,9 +92,12 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             val intent = intent
             UID = intent.getStringExtra("UID")
             firsttime = intent.getStringExtra("firsttime")
+            changed = intent.getStringExtra("Changed")
             MutableCollectionBaseActivity.UID = UID
             println("optiid" + UID+" "+firsttime)
-        } catch (e: Exception) {
+
+            getResources().getConfiguration().orientation;
+           } catch (e: Exception) {
             e.printStackTrace()
         }
 
@@ -108,6 +113,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                 )
                 intent.putExtra("UID", UID)
                 intent.putExtra("firsttime", "yes")
+                intent.putExtra("Changed", "notOK" )
                 startActivity(intent)
                 finish()
 
@@ -129,6 +135,19 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             checkboxDiffUtil = findViewById(R.id.useDiffUtil)
             viewPager = findViewById(R.id.viewPager)
 //        }
+
+            var orientation = getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                // In landscape
+                textview2.visibility = View.GONE
+                llbtmbtn.visibility = View.GONE
+            } else {
+                // In portrait
+                textview2.visibility = View.VISIBLE
+                llbtmbtn.visibility = View.VISIBLE
+
+            }
+
 
             if(firsttime.equals("yes")){
 
@@ -162,6 +181,8 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                     MutableCollectionViewActivity::class.java
                 )
                 intent.putExtra("UID", UID)
+                intent.putExtra("firsttime", "no")
+                intent.putExtra("Changed", "notOK" )
                 startActivity(intent)
 
 //            recreate()
@@ -294,10 +315,17 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             }
 
             buttonGoTo.setOnClickListener {
-                setResult(Activity.RESULT_OK) //signal something changed
+//                setResult(Activity.RESULT_OK) //signal something changed
+//                finish()
+//                val returnIntent = Intent()
+//                returnIntent.putExtra("result", "chk")
+//                setResult(Activity.RESULT_OK, returnIntent)
+//                finish()
+
+                val intent = Intent(this@MutableCollectionBaseActivity, MainActivity::class.java)
+                intent.putExtra("Changed", changed )
+                startActivity(intent)
                 finish()
-
-
             }
 
             fun changeDataSet(performChanges: () -> Unit) {
@@ -479,7 +507,11 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                     }
                     val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
                     intent.putExtra("UID", UID)
-//                    setResult(MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES,intent);
+                    intent.putExtra("firsttime", "no" )
+                    intent.putExtra("Changed", "OK" )
+//                            startActivityForResult(intent, MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES)
+                    //                    setResult(MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES,intent);
+
                     startActivity(intent)
                     finish()
 //                recreate()
@@ -490,6 +522,8 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                 val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
                 intent.putExtra("UID", UID)
 //                    setResult(MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES,intent);
+                intent.putExtra("firsttime", "no")
+                intent.putExtra("Changed", "notOK" )
                 startActivity(intent)
                 finish()
 //                recreate()

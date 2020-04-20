@@ -39,9 +39,9 @@ import android.widget.Scroller;
 import androidx.appcompat.widget.AppCompatImageView;
 
 public class TouchImageView extends AppCompatImageView {
-	
+
 	private static final String DEBUG = "DEBUG";
-	
+
 	//
 	// SuperMin and SuperMax multipliers. Determine how much the image can be
 	// zoomed below or above the zoom boundaries, before animating back to the
@@ -55,7 +55,7 @@ public class TouchImageView extends AppCompatImageView {
     // when the image is stretched to fit view.
     //
     private float normalizedScale;
-    
+
     //
     // Matrix applied to image. MSCALE_X and MSCALE_Y should always be equal.
     // MTRANS_X and MTRANS_Y are the other values used. prevMatrix is the matrix
@@ -71,27 +71,27 @@ public class TouchImageView extends AppCompatImageView {
     private float superMinScale;
     private float superMaxScale;
     private float[] m;
-    
+
     private Context context;
     private Fling fling;
-    
+
     private ScaleType mScaleType;
-    
+
     private boolean imageRenderedAtLeastOnce;
     private boolean onDrawReady;
-    
+
     private ZoomVariables delayedZoomVariables;
 
     //
     // Size of view and previous view size (ie before rotation)
     //
     private int viewWidth, viewHeight, prevViewWidth, prevViewHeight;
-    
+
     //
     // Size of image when it is stretched to fit view. Before and After rotation.
     //
     private float matchViewWidth, matchViewHeight, prevMatchViewWidth, prevMatchViewHeight;
-    
+
     private ScaleGestureDetector mScaleDetector;
     private GestureDetector mGestureDetector;
     private GestureDetector.OnDoubleTapListener doubleTapListener = null;
@@ -107,12 +107,12 @@ public class TouchImageView extends AppCompatImageView {
         super(context, attrs);
         sharedConstructing(context);
     }
-    
+
     public TouchImageView(Context context, AttributeSet attrs, int defStyle) {
     	super(context, attrs, defStyle);
     	sharedConstructing(context);
     }
-    
+
     private void sharedConstructing(Context context) {
         super.setClickable(true);
         this.context = context;
@@ -1248,18 +1248,18 @@ public class TouchImageView extends AppCompatImageView {
 	private void compatPostOnAnimation(Runnable runnable) {
     	if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
             postOnAnimation(runnable);
-            
+
         } else {
             postDelayed(runnable, 1000/60);
         }
     }
-    
+
     private class ZoomVariables {
     	public float scale;
     	public float focusX;
     	public float focusY;
     	public ScaleType scaleType;
-    	
+
     	public ZoomVariables(float scale, float focusX, float focusY, ScaleType scaleType) {
     		this.scale = scale;
     		this.focusX = focusX;
@@ -1267,7 +1267,7 @@ public class TouchImageView extends AppCompatImageView {
     		this.scaleType = scaleType;
     	}
     }
-    
+
     private void printMatrixInfo() {
     	float[] n = new float[9];
     	matrix.getValues(n);

@@ -27,14 +27,14 @@ import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import kotlinx.android.synthetic.main.activity_main.*
+import android.os.Handler
+
 
 /**
  * Shows how to use [RecyclerView.Adapter.notifyDataSetChanged] with [ViewPager2]. Here [ViewPager2]
  * represents pages as [View]s.
  */
 class MutableCollectionViewActivity : MutableCollectionBaseActivity() {
-
 
 
 
@@ -51,7 +51,13 @@ class MutableCollectionViewActivity : MutableCollectionBaseActivity() {
                 val clickHandler = { clickRegistry.registerClick(itemId) }
                 val clickCountProvider = { clickRegistry.getClickCount(itemId) }
                 val intposi = position +1;
-                holder.bind(items.getItemById(itemId),UID, intposi.toString(), clickHandler, clickCountProvider)
+                holder.bind(
+                    items.getItemById(itemId),
+                    UID,
+                    intposi.toString(),
+                    clickHandler,
+                    clickCountProvider
+                )
             }
 
             override fun getItemCount(): Int = items.size
@@ -73,8 +79,14 @@ class PageViewHolder(parent: ViewGroup) :
     private val textViewCount: TextView = itemView.findViewById(R.id.textViewCount)
     private val buttonCountIncrease: Button = itemView.findViewById(R.id.buttonCountIncrease)
 
-    fun bind(itemText: String, UID: String, posi: String, registerClick: () -> Unit, getClickCount: () -> Int) {
-       Log.e("sonabind", posi+itemText+"w")
+    fun bind(
+        itemText: String,
+        UID: String,
+        posi: String,
+        registerClick: () -> Unit,
+        getClickCount: () -> Int
+    ) {
+        Log.e("sonabind", posi+itemText+"w")
         textViewItemId.text = itemText
         val updateClickText = { textViewCount.text = "${getClickCount()}" }
         updateClickText()
@@ -87,10 +99,56 @@ class PageViewHolder(parent: ViewGroup) :
             )
         )
 
+        var cc = 0;
+        img.setOnClickListener {
+            cc++
+            println("singlclick"+posi.toString()+"   "+LibraryFilesystem.getUriFromFilename(
+                    LibraryFilesystem.getFileNameByUID(
+                        UID,
+                        posi
+                    ))+"   "+cc)
+            if (cc <= 3 && cc > 1){
+                doAction(posi, LibraryFilesystem.getFileNameByUID(UID, posi))
+                cc = 0
+            }
+
+        }
+
+        //////this double click will work perfect if not use zoom on image view
+       /* var isDoubleCliked = false
+        val handler = Handler()
+        val r = object:Runnable {
+            public override fun run() {
+                //Actions when Single Clicked
+                isDoubleCliked = false
+            }
+        }
+        img.setOnClickListener(View.OnClickListener { view ->
+            println("whatis"+isDoubleCliked)
+            if(isDoubleCliked){
+                //Actions when double Clicked
+                doAction(posi, LibraryFilesystem.getFileNameByUID(UID, posi))
+                isDoubleCliked=false;
+                //remove callbacks for Handlers
+                handler.removeCallbacks(r);
+            }else{
+                isDoubleCliked=true;
+                handler.postDelayed(r,500);
+            }
+
+        })*/
+/////////////////////////////////////////////end double click
+
         buttonCountIncrease.setOnClickListener {
             registerClick()
             updateClickText()
         }
+    }
+
+    private fun doAction( posi: String,
+                          filnm: String
+                          ) {
+        println("doubleclick"+ posi+"    "+filnm)
     }
 
 

@@ -25,13 +25,61 @@
         android:layout_centerInParent="true"
         android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/gotomanager"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:textSize="12dp"
-        android:layout_alignParentBottom="true"
-        android:text="Select image"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/gotomanager"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12dp"
+            android:layout_margin="@dimen/spacer_small"
+            android:text="Select image"/>
+
+        <Button
+            android:id="@+id/buttonRemoveNo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/spacer_small"
+            android:textSize="12dp"
+            android:enabled="false"
+            android:text="@string/remove_page"/>
+        <Button
+            android:id="@+id/buttonCropNo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/spacer_small"
+            android:textSize="12dp"
+            android:enabled="false"
+            android:text="Crop"/>
+
+        <Button
+            android:id="@+id/buttonAddnextNo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/spacer_small"
+            android:textSize="12dp"
+            android:enabled="false"
+            android:text="Add New After"/>
+
+        <Button
+            android:id="@+id/buttonAddAfter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/spacer_small"
+            android:textSize="12dp"
+            android:visibility="gone"
+            android:text="Add in last"/>
+    </LinearLayout>
 
 </RelativeLayout>

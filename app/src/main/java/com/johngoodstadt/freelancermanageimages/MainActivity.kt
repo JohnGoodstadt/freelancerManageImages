@@ -14,6 +14,7 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_MANAGE_IMAGES = 1000
     }
 
+    var changed: String = ""
 
     val UID = "HANDLE"
 //    val UID = "BACH"
@@ -21,18 +22,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        try {
+            changed = intent.getStringExtra("Changed")
+            println("something"+changed)
+            if(changed.equals("OK")){
+                refreshImages()
 
-        textview1.setOnClickListener {
-                        val intent = Intent(this@MainActivity, MutableCollectionViewActivity::class.java)
-            intent.putExtra("UID", UID)
-            startActivityForResult(intent, RequestCodes.REQUEST_MANAGE_IMAGES)
+            }else{
+                println("something"+changed)
 
-        }
+            }
+        }catch (e:Exception){}
+
 
         button1.setOnClickListener {
             val intent = Intent(this@MainActivity, MutableCollectionViewActivity::class.java)
 //            val intent = Intent(this@MainActivity, ManageImagesActivity::class.java)
             intent.putExtra("UID", UID)
+            intent.putExtra("firsttime", "no" )
+            intent.putExtra("Changed", "notOK" )
             startActivityForResult(intent, RequestCodes.REQUEST_MANAGE_IMAGES)
 
 
@@ -69,22 +77,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RequestCodes.REQUEST_MANAGE_IMAGES) {
-
-            if (resultCode == Activity.RESULT_OK){
-                println("Something changed")
-                refreshImages()
-                recreate()
-            }else{
-                println("Nothing done")
-                refreshImages()
-                recreate()
-
-            }
-
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        println("Onacti")
+//
+//        if (requestCode == RequestCodes.REQUEST_MANAGE_IMAGES) {
+//            if (resultCode == Activity.RESULT_OK){
+//                val result = data!!.getStringExtra("result");
+//                println("Something changed")
+//                refreshImages()
+//                recreate()
+//            }else{
+//                println("Nothing done")
+//                refreshImages()
+//                recreate()
+//
+//            }
+//
+//        }
+//    }
 }
