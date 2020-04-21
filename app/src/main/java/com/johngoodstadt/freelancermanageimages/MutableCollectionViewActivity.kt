@@ -87,7 +87,8 @@ class PageViewHolder(parent: ViewGroup) :
         getClickCount: () -> Int
     ) {
         Log.e("sonabind", posi+itemText+"w")
-        textViewItemId.text = itemText
+        textViewItemId.text = posi
+//        textViewItemId.text = itemText
         val updateClickText = { textViewCount.text = "${getClickCount()}" }
         updateClickText()
         img.setImageURI(
@@ -99,7 +100,7 @@ class PageViewHolder(parent: ViewGroup) :
             )
         )
 
-        var cc = 0;
+        /*var cc = 0;
         img.setOnClickListener {
             cc++
             println("singlclick"+posi.toString()+"   "+LibraryFilesystem.getUriFromFilename(
@@ -112,10 +113,10 @@ class PageViewHolder(parent: ViewGroup) :
                 cc = 0
             }
 
-        }
+        }*/
 
         //////this double click will work perfect if not use zoom on image view
-       /* var isDoubleCliked = false
+        var isDoubleCliked = false
         val handler = Handler()
         val r = object:Runnable {
             public override fun run() {
@@ -136,7 +137,7 @@ class PageViewHolder(parent: ViewGroup) :
                 handler.postDelayed(r,500);
             }
 
-        })*/
+        })
 /////////////////////////////////////////////end double click
 
         buttonCountIncrease.setOnClickListener {

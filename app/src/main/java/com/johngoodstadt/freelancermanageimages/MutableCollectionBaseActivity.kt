@@ -68,6 +68,9 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
     var firsttime: String = "no"
     var onactiposi: Int = 1
     var howmanypage: Int = 1
+    //////////////////this var is used for set page after clicked image
+    var Setviewposi: Int = 0
+
     companion object {
         public var UID = "Example"
     }
@@ -75,17 +78,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_manage_images)
 
-//
-//        buttonAddAfter = findViewById(R.id.buttonAddAfter)
-//        buttonAddnext = findViewById(R.id.buttonAddnext)
-//        buttonGoTo = findViewById(R.id.buttonGoTo)
-//        buttonCrop = findViewById(R.id.buttonCrop)
-//        buttonRemove = findViewById(R.id.buttonRemove)
-//        itemSpinner = findViewById(R.id.itemSpinner)
-//        checkboxDiffUtil = findViewById(R.id.useDiffUtil)
-//        viewPager = findViewById(R.id.viewPager)
 ////////////////////from manger
 
         try {
@@ -93,20 +86,20 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
             UID = intent.getStringExtra("UID")
             firsttime = intent.getStringExtra("firsttime")
             changed = intent.getStringExtra("Changed")
+            Setviewposi = intent.getIntExtra("viewposi",0)
             MutableCollectionBaseActivity.UID = UID
             println("optiid" + UID+" "+firsttime)
 
             getResources().getConfiguration().orientation;
            } catch (e: Exception) {
-            e.printStackTrace()
-        }
+           }
 
 /////////////////////for intial imag for viewpager
         howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
         Log.e("sonamany", howmanypage.toString() + "onc")
         if (howmanypage == 0 && firsttime.equals("no")) {
             setContentView(R.layout.noimg);
-            gotomanager.setOnClickListener {
+            buttonAddnextNo.setOnClickListener {
                 val intent = Intent(
                     this@MutableCollectionBaseActivity,
                     MutableCollectionViewActivity::class.java
@@ -119,9 +112,23 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
             }
 
-//            items.addNewAt(viewPager.currentItem)
+            gotomanager.setOnClickListener {
+                //                setResult(Activity.RESULT_OK) //signal something changed
+//                finish()
+//                val returnIntent = Intent()
+//                returnIntent.putExtra("result", "chk")
+//                setResult(Activity.RESULT_OK, returnIntent)
+//                finish()
 
-//            addanother(1)
+                try {
+                    val intent =
+                        Intent(this@MutableCollectionBaseActivity, MainActivity::class.java)
+                    intent.putExtra("Changed", changed)
+                    startActivity(intent)
+                    finish()
+                }catch (e: Exception){}
+            }
+
         } else {
             howmanypage = LibraryFilesystem.getCountOfPhotoScorePages(UID)
             setContentView(R.layout.activity_manage_images)
@@ -165,7 +172,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
 
             //remove at 1
-            fun removefileat1(posi: Int) {
+            fun removeFileAtPosition(posi: Int) {
                 val filenumber = posi
                 val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
 
@@ -219,49 +226,10 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                 CropImage.activity(uri).start(this);
 
                 writeDebug()
-//            val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-//            removeFileAndRenameDown(UID, filenumber, posi)
 
-
-                /*  writeDebug()
-    //            val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
-    //            startActivity(intent)
-                recreate()
-    //            finish()
-    */
 
             }
 
-            fun imginsertatend(posi: Int) {
-                val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-                Log.e("sonainsrt", number.toString() + " " + posi);
-
-                /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
-                    return@setOnClickListener
-                }*/
-
-                val filenumber = number + 1
-//            val filenumber = posi + 1
-
-                onactiposi = filenumber
-                CropImage.activity().start(this);
-
-                writeDebug()
-            }
-
-            fun imginsertat2(posi: Int) {
-                val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
-                Log.e("sonainsrt", number.toString() + " " + posi);
-
-                /*if(LibraryFilesystem.getCountOfPhotoScorePages(UID) == 0){
-                    return@setOnClickListener
-                }*/
-
-                onactiposi = posi
-                CropImage.activity().start(this);
-
-                writeDebug()
-            }
 
             fun imginsertatNext(posi: Int) {
                 val number = LibraryFilesystem.getCountOfPhotoScorePages(UID)
@@ -314,6 +282,8 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                 override fun getCount(): Int = items.size
             }
 
+            viewPager.setCurrentItem((Setviewposi), false)
+
             buttonGoTo.setOnClickListener {
 //                setResult(Activity.RESULT_OK) //signal something changed
 //                finish()
@@ -322,10 +292,13 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 //                setResult(Activity.RESULT_OK, returnIntent)
 //                finish()
 
-                val intent = Intent(this@MutableCollectionBaseActivity, MainActivity::class.java)
-                intent.putExtra("Changed", changed )
-                startActivity(intent)
-                finish()
+                try {
+                    val intent =
+                        Intent(this@MutableCollectionBaseActivity, MainActivity::class.java)
+                    intent.putExtra("Changed", changed)
+                    startActivity(intent)
+                    finish()
+                }catch (e: Exception){}
             }
 
             fun changeDataSet(performChanges: () -> Unit) {
@@ -341,32 +314,6 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 //                viewPager.setCurrentItem(newPosition, false)
 
 
-//            if (checkboxDiffUtil.isChecked) {
-//                /** using [DiffUtil] */
-//                val idsOld = items.createIdSnapshot()
-//                performChanges()
-//                val idsNew = items.createIdSnapshot()
-//                DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-//                    override fun getOldListSize(): Int = idsOld.size
-//                    override fun getNewListSize(): Int = idsNew.size
-//
-//                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-//                        idsOld[oldItemPosition] == idsNew[newItemPosition]
-//
-//                    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-//                        areItemsTheSame(oldItemPosition, newItemPosition)
-//                }, true).dispatchUpdatesTo(viewPager.adapter!!)
-//            } else {
-//                /** without [DiffUtil] */
-//                val oldPosition = viewPager.currentItem
-//                val currentItemId = items.itemId(oldPosition)
-//                performChanges()
-//                viewPager.adapter!!.notifyDataSetChanged()
-//                if (items.contains(currentItemId)) {
-//                    val newPosition =
-//                        (0 until items.size).indexOfFirst { items.itemId(it) == currentItemId }
-//                    viewPager.setCurrentItem(newPosition, false)
-//                }
 
                 }
 
@@ -380,7 +327,7 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
 
                     changeDataSet { items.removeAt(viewPager.currentItem + 1) }
 //            changeDataSet { items.removeAt(itemSpinner.selectedItemPosition) }
-                    removefileat1(viewPager.currentItem + 1)
+                    removeFileAtPosition(viewPager.currentItem + 1)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     changeDataSet {
@@ -413,19 +360,8 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                 Log.e("sonacurrenext", viewPager.currentItem.toString() + " ");
                 changeDataSet { items.addNewAt(viewPager.currentItem + 1) }
                 imginsertatNext(viewPager.currentItem + 2)
-//            imginsertatNext(itemSpinner.selectedItemPosition+1)
-//            imginsertatNext(6)
-//            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition+1) }
-//            changeDataSet { items.addNewAt(6) }
-            }
+              }
 
-            buttonAddAfter.setOnClickListener {
-                Log.e("sonacurre", viewPager.currentItem.toString());
-                changeDataSet { items.addNewAt(viewPager.currentItem + 1) }
-//            changeDataSet { items.addNewAt(itemSpinner.selectedItemPosition + 1) }
-
-                imginsertatend(viewPager.currentItem)
-            }
         }
 
 
@@ -479,14 +415,15 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
             if (resultCode == Activity.RESULT_OK) {
-                println("Something changedmanage")
+                var viewposi = onactiposi
+
+                println("Something changedmanage"+viewposi)
                 data?.let {
                     val result = CropImage.getActivityResult(it)
                     val bitmap = MediaStore.Images.Media.getBitmap(
                         MyApplication.getAppContext().getContentResolver(),
                         result.uri
                     )
-
                     val startnumber = onactiposi
                     val lastNumber = LibraryFilesystem.getCountOfPhotoScorePages(UID)
                     Log.e("sonaActifr", startnumber.toString()+" "+lastNumber.toString());
@@ -500,14 +437,21 @@ abstract class MutableCollectionBaseActivity : FragmentActivity() {
                         val count = LibraryFilesystem.getCountOfPhotoScorePages(UID)
                         try {
                             removeFileAndRenameDown(UID, onactiposi + 1, count)
+                            viewposi = onactiposi - 1
 
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
+                    }else{
+                        viewposi = onactiposi - 1
+
                     }
+
+                    println("gotposi"+viewposi)
                     val intent = Intent(this@MutableCollectionBaseActivity, MutableCollectionViewActivity::class.java)
                     intent.putExtra("UID", UID)
                     intent.putExtra("firsttime", "no" )
+                    intent.putExtra("viewposi", viewposi )
                     intent.putExtra("Changed", "OK" )
 //                            startActivityForResult(intent, MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES)
                     //                    setResult(MainActivity.RequestCodes.REQUEST_MANAGE_IMAGES,intent);

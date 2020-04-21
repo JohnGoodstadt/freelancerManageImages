@@ -40,7 +40,7 @@
             android:layout_weight="1"
             android:textSize="12dp"
             android:layout_margin="@dimen/spacer_small"
-            android:text="Select image"/>
+            android:text="Done"/>
 
         <Button
             android:id="@+id/buttonRemoveNo"
@@ -68,8 +68,8 @@
             android:layout_weight="1"
             android:layout_margin="@dimen/spacer_small"
             android:textSize="12dp"
-            android:enabled="false"
-            android:text="Add New After"/>
+            android:enabled="true"
+            android:text="Add Image"/>
 
         <Button
             android:id="@+id/buttonAddAfter"
